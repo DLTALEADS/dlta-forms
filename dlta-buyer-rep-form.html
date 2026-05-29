@@ -316,8 +316,10 @@ async function generatePDF() {
     if (v('date_buyer')) fields.push({field_id:'Date2', value: fmtDate(v('date_buyer'))});
     if (v('date_brok')) fields.push({field_id:'Date3', value: fmtDate(v('date_brok'))});
 
-    await fillPDFBrowser('CAR_NEBBA_0126.pdf', fields,
-      `NEBBA_${(v('buyer')||'buyer').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30)}.pdf`);
+    const fieldValues = {};
+    fields.forEach(({field_id, value}) => { if (value !== undefined && value !== '') fieldValues[field_id] = value; });
+    const fname = `NEBBA_${(v('buyer')||'buyer').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30)}.pdf`;
+    await fillPDFOverlay('CAR_NEBBA_0126.pdf', fieldValues, NEBBA_FIELDS, fname);
 
   } catch(e) {
     console.error(e);
@@ -326,39 +328,140 @@ async function generatePDF() {
   btn.textContent = '⬇ Generate & Download PDF'; btn.disabled = false;
 }
 
-async function fillPDFBrowser(filename, fields, outName) {
-  if (!window.PDFLib) {
-    await new Promise((res,rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-  }
-  const { PDFDocument } = window.PDFLib;
-  const res = await fetch(filename);
-  if (!res.ok) throw new Error(`Could not load ${filename}`);
-  const arrayBuf = await res.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
-  const form = pdfDoc.getForm();
-  for (const {field_id, value} of fields) {
-    try {
-      const field = form.getField(field_id);
-      if (!field) continue;
-      const type = field.constructor.name;
-      if (type === 'PDFTextField') field.setText(String(value));
-      else if (type === 'PDFCheckBox') { if (value === 'Yes') field.check(); else field.uncheck(); }
-      else if (type === 'PDFRadioGroup') { try { field.select(String(value)); } catch(e) {} }
-    } catch(e) {}
-  }
-  
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], {type:'application/pdf'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = outName; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+const NEBBA_FIELDS = {
+  "BuyerOneName": {"page": 1, "x": 339.77, "y": 147.2, "w": 205.87, "h": 14.4, "fs": 9},
+  "BuyerBrokerCompanyName": {"page": 1, "x": 60.43, "y": 147.75, "w": 201.14, "h": 14.4, "fs": 9},
+  "AddressLong": {"page": 1, "x": 61.12, "y": 203.65, "w": 384.95, "h": 14.4, "fs": 9},
+  "BuyerAgentName": {"page": 1, "x": 354.19, "y": 327.63, "w": 229.8, "h": 14.4, "fs": 9},
+  "Term1": {"page": 1, "x": 369.29, "y": 431.75, "w": 169.38, "h": 14.4, "fs": 9},
+  "Term2": {"page": 1, "x": 554.06, "y": 431.9, "w": 30.97, "h": 14.4, "fs": 9},
+  "Term4": {"page": 1, "x": 476.21, "y": 445.92, "w": 30.97, "h": 14.4, "fs": 9},
+  "Term3": {"page": 1, "x": 291.13, "y": 446.19, "w": 169.38, "h": 14.4, "fs": 9},
+  "Other1": {"page": 1, "x": 125.52, "y": 662.51, "w": 453.26, "h": 14.4, "fs": 9},
+  "Other2": {"page": 2, "x": 125.0, "y": 265.99, "w": 460.36, "h": 14.4, "fs": 9},
+  "Other3": {"page": 2, "x": 125.52, "y": 440.47, "w": 460.36, "h": 14.4, "fs": 9},
+  "Compensation1": {"page": 3, "x": 389.66, "y": 80.3, "w": 35.17, "h": 14.4, "fs": 9},
+  "AcquisitionCommission": {"page": 3, "x": 319.07, "y": 94.8, "w": 69.77, "h": 14.4, "fs": 9},
+  "AcquisitionFee": {"page": 3, "x": 328.62, "y": 182.8, "w": 70.12, "h": 14.4, "fs": 9},
+  "HourlyRate": {"page": 3, "x": 233.23, "y": 257.08, "w": 55.06, "h": 14.4, "fs": 9},
+  "Services1": {"page": 3, "x": 115.19, "y": 285.91, "w": 469.05, "h": 14.4, "fs": 9},
+  "Services2": {"page": 3, "x": 115.29, "y": 300.35, "w": 469.05, "h": 14.4, "fs": 9},
+  "Other4": {"page": 3, "x": 138.93, "y": 376.8, "w": 439.65, "h": 14.4, "fs": 9},
+  "Other5": {"page": 3, "x": 139.86, "y": 391.5, "w": 343.89, "h": 14.4, "fs": 9},
+  "Retainer": {"page": 3, "x": 66.48, "y": 543.85, "w": 70.95, "h": 14.4, "fs": 9},
+  "AdditionalCompensationTerms1": {"page": 3, "x": 60.75, "y": 613.97, "w": 523.7, "h": 14.4, "fs": 9},
+  "AdditionalCompensationTerms2": {"page": 3, "x": 60.54, "y": 627.44, "w": 523.7, "h": 14.4, "fs": 9},
+  "TerminationByBuyer": {"page": 4, "x": 478.32, "y": 617.59, "w": 65.42, "h": 14.4, "fs": 9},
+  "DesignatedManagingBrokerName": {"page": 6, "x": 451.12, "y": 46.92, "w": 132.04, "h": 14.4, "fs": 9},
+  "Date3": {"page": 6, "x": 351.44, "y": 80.76, "w": 231.67, "h": 14.4, "fs": 9},
+  "Date2": {"page": 6, "x": 61.36, "y": 81.29, "w": 223.93, "h": 14.4, "fs": 9},
+  "SponsoringBrokerName": {"page": 6, "x": 390.59, "y": 115.33, "w": 191.69, "h": 14.4, "fs": 9},
+  "SponsoringBrokerAddress": {"page": 6, "x": 362.39, "y": 132.06, "w": 224.19, "h": 14.4, "fs": 9},
+  "SellerLegalAgent1": {"page": 6, "x": 42.85, "y": 132.33, "w": 248.36, "h": 14.4, "fs": 9},
+  "SponsoringBrokerState": {"page": 6, "x": 494.3, "y": 148.79, "w": 28.69, "h": 14.4, "fs": 9},
+  "SponsoringBrokerCity": {"page": 6, "x": 348.81, "y": 149.05, "w": 122.93, "h": 14.4, "fs": 9},
+  "SponsoringBrokerZip": {"page": 6, "x": 537.57, "y": 149.05, "w": 45.59, "h": 14.4, "fs": 9},
+  "SellerLegalAgent2": {"page": 6, "x": 43.29, "y": 149.67, "w": 247.31, "h": 14.4, "fs": 9},
+  "SponsoringBrokerOfficePhone": {"page": 6, "x": 377.45, "y": 166.49, "w": 88.6, "h": 14.4, "fs": 9},
+  "SponsoringBrokerFax": {"page": 6, "x": 481.51, "y": 166.57, "w": 88.33, "h": 14.4, "fs": 9},
+  "SponsoringBrokerOfficeMLSId": {"page": 6, "x": 379.12, "y": 182.6, "w": 99.9, "h": 14.4, "fs": 9},
+  "SellerOneName": {"page": 6, "x": 114.5, "y": 183.16, "w": 175.75, "h": 14.4, "fs": 9},
+  "SellerTwoName": {"page": 6, "x": 114.33, "y": 200.59, "w": 176.28, "h": 14.4, "fs": 9},
+  "SellerAddressShort": {"page": 6, "x": 73.43, "y": 218.46, "w": 211.4, "h": 14.57, "fs": 9},
+  "DesignatedAgentName": {"page": 6, "x": 434.5, "y": 219.31, "w": 148.16, "h": 14.4, "fs": 9},
+  "SellerCity": {"page": 6, "x": 58.1, "y": 235.19, "w": 115.84, "h": 14.4, "fs": 9},
+  "SellerState": {"page": 6, "x": 193.6, "y": 235.19, "w": 33.24, "h": 14.4, "fs": 9},
+  "SellerZip": {"page": 6, "x": 239.76, "y": 234.95, "w": 48.04, "h": 14.71, "fs": 9},
+  "DesignatedAgentMLSId": {"page": 6, "x": 417.35, "y": 235.37, "w": 164.71, "h": 14.4, "fs": 9},
+  "Phone1": {"page": 6, "x": 43.39, "y": 253.16, "w": 52.42, "h": 14.4, "fs": 9},
+  "DesignatedAgentOnePhone": {"page": 6, "x": 383.71, "y": 253.41, "w": 183.37, "h": 14.4, "fs": 9},
+  "Phone2": {"page": 6, "x": 125.63, "y": 253.51, "w": 163.66, "h": 14.54, "fs": 9},
+  "Phone3": {"page": 6, "x": 43.12, "y": 269.88, "w": 52.25, "h": 14.4, "fs": 9},
+  "DesignatedAgentTwoPhone": {"page": 6, "x": 383.45, "y": 270.23, "w": 199.05, "h": 14.4, "fs": 9},
+  "Phone4": {"page": 6, "x": 125.1, "y": 270.72, "w": 165.06, "h": 14.52, "fs": 9},
+  "Phone5": {"page": 6, "x": 43.38, "y": 287.22, "w": 51.9, "h": 14.4, "fs": 9},
+  "Phone6": {"page": 6, "x": 125.63, "y": 287.22, "w": 164.54, "h": 14.4, "fs": 9},
+  "DesignatedAgentFax": {"page": 6, "x": 367.95, "y": 287.31, "w": 215.69, "h": 14.4, "fs": 9},
+  "Phone7": {"page": 6, "x": 43.38, "y": 304.04, "w": 51.9, "h": 14.4, "fs": 9},
+  "Phone8": {"page": 6, "x": 125.63, "y": 304.3, "w": 163.66, "h": 14.4, "fs": 9},
+  "DesignatedAgentEmail": {"page": 6, "x": 374.08, "y": 305.0, "w": 207.81, "h": 14.4, "fs": 9},
+  "SellerOneEmail": {"page": 6, "x": 98.04, "y": 322.69, "w": 192.48, "h": 14.4, "fs": 9},
+  "SellerTwoEmail": {"page": 6, "x": 98.43, "y": 338.99, "w": 191.61, "h": 14.4, "fs": 9},
+};
+
+// Shared PDF overlay engine - uses pdf.js to render pages + jsPDF to overlay text
+// No server needed. Works from GitHub Pages.
+
+async function loadLib(src) {
+  if (document.querySelector(`script[src="${src}"]`)) return;
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
 }
+
+async function fillPDFOverlay(pdfFilename, fieldValues, coordMap, outputFilename) {
+  // Load libraries
+  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+
+  const { jsPDF } = window.jspdf;
+  const pdfjsLib = window.pdfjsLib;
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  // Fetch original PDF
+  const resp = await fetch(pdfFilename);
+  if (!resp.ok) throw new Error(`Cannot load ${pdfFilename}`);
+  const arrayBuf = await resp.arrayBuffer();
+
+  // Load with pdf.js
+  const pdfDoc = await pdfjsLib.getDocument({data: arrayBuf}).promise;
+  const numPages = pdfDoc.numPages;
+
+  // Create output jsPDF doc (letter size)
+  const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+
+  for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+    if (pageNum > 1) doc.addPage('letter', 'portrait');
+
+    // Render PDF page to canvas at 2x for crisp output
+    const page = await pdfDoc.getPage(pageNum);
+    const scale = 2.0;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    // Add as background image (full page)
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    doc.addImage(imgData, 'JPEG', 0, 0, 612, 792);
+
+    // Overlay text fields for this page
+    for (const [fieldId, coords] of Object.entries(coordMap)) {
+      if (coords.page !== pageNum) continue;
+      const val = fieldValues[fieldId];
+      if (!val) continue;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(coords.fs);
+      doc.setTextColor(0, 0, 0);
+
+      // Clip text to field width
+      const maxW = coords.w - 2;
+      const text = String(val);
+      // y is from top of page to top of field; text baseline is at bottom of field
+      const textY = coords.y + coords.h - 2;
+      doc.text(text, coords.x + 1, textY, { maxWidth: maxW });
+    }
+  }
+
+  doc.save(outputFilename);
+}
+
 
 function clearAll() {
   document.querySelectorAll('input:not([type=checkbox]):not([type=radio])').forEach(i => {
