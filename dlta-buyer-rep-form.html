@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DLTA Buyer Rep">
+<title>DLTA · Non-Exclusive Buyer Rep</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1A3A8B;--blue-bright:#2A4A9B;--charcoal:#3A3535;
+  --bg:#F5F3F0;--border:#DDD8D0;--muted:#7A7270;
+  --field-bg:#FAFAF9;--gold:#C9A84C;--red:#8B1A1A;
+}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--charcoal);min-height:100vh}
+.topbar{background:var(--blue);height:4px}
+header{
+  background:white;border-bottom:1px solid var(--border);
+  padding:12px 20px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+.logo-svg{width:40px;height:30px;flex-shrink:0}
+.hdr-div{width:1.5px;height:32px;background:var(--border)}
+.hdr-name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--red)}
+.hdr-form{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.hdr-back{margin-left:auto;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px}
+.hdr-back:hover{color:var(--blue)}
+
+main{max-width:760px;margin:0 auto;padding:20px 14px 60px}
+
+.section{background:white;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.section-hdr{padding:8px 16px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:white}
+.section-hdr.blue{background:var(--blue)}
+.section-hdr.dark{background:#0F2560}
+.section-hdr.gray{background:var(--charcoal)}
+.section-body{padding:16px}
+
+.fields{display:grid;gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.field input,.field select{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  background:var(--field-bg);border:1.5px solid var(--border);
+  border-radius:4px;padding:9px 11px;color:var(--charcoal);
+  transition:border-color .15s,box-shadow .15s;width:100%;-webkit-appearance:none
+}
+.field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,58,139,.08);background:white}
+.field input::placeholder{color:#C8C2BA}
+
+.check-row{display:flex;align-items:center;gap:8px;padding:6px 0}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0}
+.check-row label{font-size:11px;color:var(--charcoal);cursor:pointer}
+
+.radio-group{display:flex;gap:20px;padding:6px 0}
+.radio-item{display:flex;align-items:center;gap:6px}
+.radio-item input[type=radio]{width:14px;height:14px;accent-color:var(--blue)}
+.radio-item label{font-size:11px;color:var(--charcoal);cursor:pointer}
+
+.defaults-note{font-size:9.5px;color:var(--muted);padding:7px 10px;background:#FBF9F7;border-left:3px solid var(--gold);border-radius:0 3px 3px 0;margin-bottom:10px;line-height:1.5}
+.section-note{font-size:9px;color:var(--muted);padding:8px 0 4px;line-height:1.6}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.btn{
+  font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:600;padding:13px 16px;
+  border-radius:4px;border:none;cursor:pointer;transition:all .15s;flex:1
+}
+.btn-blue{background:var(--blue);color:white}
+.btn-blue:hover{background:var(--blue-bright)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border);flex:none;padding:13px 14px}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+
+.progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.progress-bar{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}
+
+@media(max-width:520px){.two,.three,.four{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <svg class="logo-svg" viewBox="0 0 80 60" fill="none">
+    <polygon points="40,2 76,54 4,54" fill="#8B1A1A"/>
+    <polygon points="40,18 62,54 18,54" fill="#A52020"/>
+    <polygon points="40,24 58,54 22,54" fill="white"/>
+    <rect x="33" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="33" y="45" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="45" width="6" height="6" fill="#3A3535"/>
+  </svg>
+  <div class="hdr-div"></div>
+  <div>
+    <div class="hdr-name">Delta Realty Corp.</div>
+    <div class="hdr-form">Non-Exclusive Buyer Rep · CAR NEBBA 01.2026</div>
+  </div>
+  <a href="index.html" class="hdr-back">← All Forms</a>
+</header>
+
+<main>
+  <div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="btn-row">
+    <button class="btn btn-blue" onclick="generatePDF()">⬇ Generate &amp; Download PDF</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="section">
+    <div class="section-hdr blue">1 · Parties</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Brokerage Name</label><input id="brokerage" value="Delta Realty Corp." placeholder="Delta Realty Corp."></div>
+          <div class="field"><label>Buyer Name(s)</label><input id="buyer" placeholder="John Doe"></div>
+        </div>
+        <div class="field"><label>Location (region, city, neighborhood, county)</label><input id="location" placeholder="Chicago, IL and surrounding suburbs"></div>
+        <div class="field"><label>Buyer's Designated Agent</label><input id="agent" placeholder="Tom Mackrola"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERM -->
+  <div class="section">
+    <div class="section-hdr blue">4 · Term</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="four">
+          <div class="field"><label>Effective Date</label><input id="eff_date" type="date"></div>
+          <div class="field"><label>Eff. Year</label><input id="eff_year" placeholder="2026" maxlength="4"></div>
+          <div class="field"><label>Termination Date</label><input id="term_date" type="date"></div>
+          <div class="field"><label>Term. Year</label><input id="term_year" placeholder="2026" maxlength="4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPENSATION -->
+  <div class="section">
+    <div class="section-hdr blue">10 · Compensation</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="section-note">Select one compensation type:</div>
+        <div class="check-row"><input type="checkbox" id="pct_chk"><label for="pct_chk">A. Percentage Commission</label></div>
+        <div class="two">
+          <div class="field"><label>Commission %</label><input id="pct_comm" placeholder="2.5"></div>
+          <div class="field"><label>Minimum $ (not less than)</label><input id="pct_min" placeholder="0.00"></div>
+        </div>
+        <div class="check-row"><input type="checkbox" id="flat_chk"><label for="flat_chk">B. Flat Rate</label></div>
+        <div class="field"><label>Flat Rate $</label><input id="flat_rate" placeholder="0.00"></div>
+        <div class="check-row"><input type="checkbox" id="hourly_chk"><label for="hourly_chk">C. Hourly Rate</label></div>
+        <div class="field"><label>Hourly Rate $/hr</label><input id="hourly_rate" placeholder="0.00"></div>
+        <div class="field"><label>Retainer $ (non-refundable, if any)</label><input id="retainer" placeholder="0.00"></div>
+        <div class="radio-group">
+          <div style="font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:8px;align-self:center">Retainer applied to compensation:</div>
+          <div class="radio-item"><input type="radio" name="retainer_apply" id="ret_yes" value="yes"><label for="ret_yes">Shall apply</label></div>
+          <div class="radio-item"><input type="radio" name="retainer_apply" id="ret_no" value="no"><label for="ret_no">Shall not apply</label></div>
+        </div>
+        <div class="field"><label>Early Termination Fee $</label><input id="term_fee" placeholder="0.00"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DUAL AGENCY -->
+  <div class="section">
+    <div class="section-hdr gray">11 · Dual Agency Consent</div>
+    <div class="section-body">
+      <div class="section-note">Buyer consents to designated agent acting as dual agent:</div>
+      <div class="radio-group">
+        <div class="radio-item"><input type="radio" name="dual" id="dual_yes" value="yes"><label for="dual_yes">Yes — Prior Consent to Dual Agency</label></div>
+        <div class="radio-item"><input type="radio" name="dual" id="dual_no" value="no"><label for="dual_no">No — Do not consent</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENT/BROKERAGE INFO -->
+  <div class="section">
+    <div class="section-hdr blue">Agent &amp; Brokerage Info</div>
+    <div class="section-body">
+      <div class="defaults-note">Pre-filled with DLTA defaults — edit as needed.</div>
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Designated Agent Name</label><input id="agent2" value="Tom Mackrola" placeholder="Tom Mackrola"></div>
+          <div class="field"><label>Agent MLS ID</label><input id="agent_mls" placeholder="12345"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Agent Phone 1</label><input id="agent_ph1" placeholder="(708) 555-1234"></div>
+          <div class="field"><label>Agent Email</label><input id="agent_email" value="tom@deltarealtychi.com" placeholder="tom@deltarealtychi.com"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Managing Broker Name</label><input id="mgr_broker" value="George Filippidis" placeholder="George Filippidis"></div>
+          <div class="field"><label>Brokerage Office Phone</label><input id="brok_phone" value="(708) 425-1000" placeholder="(708) 425-1000"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>Brokerage Address</label><input id="brok_addr" value="4949 W 95th St" placeholder="4949 W 95th St"></div>
+          <div class="field"><label>City</label><input id="brok_city" value="Oak Lawn" placeholder="Oak Lawn"></div>
+          <div class="field"><label>State / Zip</label><input id="brok_state_zip" value="IL 60453" placeholder="IL 60453"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Buyer 1 Name (print)</label><input id="buyer1_print" placeholder="John Doe"></div>
+          <div class="field"><label>Buyer 2 Name (print, if any)</label><input id="buyer2_print" placeholder="Jane Doe"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Buyer Address</label><input id="buyer_addr" placeholder="123 Main St"></div>
+          <div class="field"><label>City / State / Zip</label><input id="buyer_csz" placeholder="Chicago IL 60601"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Buyer Email 1</label><input id="buyer_email1" placeholder="buyer@email.com"></div>
+          <div class="field"><label>Buyer Email 2 (if any)</label><input id="buyer_email2" placeholder=""></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Signing Date (Buyer)</label><input id="date_buyer" type="date"></div>
+          <div class="field"><label>Signing Date (Brokerage)</label><input id="date_brok" type="date"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-blue" onclick="generatePDF()">⬇ Generate &amp; Download PDF</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+  </div>
+</main>
+
+<script>
+function updateProgress() {
+  const inputs = document.querySelectorAll('input:not([type=checkbox]):not([type=radio])');
+  const filled = Array.from(inputs).filter(i => i.value.trim()).length;
+  document.getElementById('progress-bar').style.width = Math.round(filled/inputs.length*100)+'%';
+}
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateProgress));
+
+const today = new Date().toISOString().slice(0,10);
+document.getElementById('date_buyer').value = today;
+document.getElementById('date_brok').value = today;
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function fmtDate(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const months=['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+}
+
+async function generatePDF() {
+  const btn = document.querySelector('.btn-blue');
+  btn.textContent = 'Generating...'; btn.disabled = true;
+
+  try {
+    const fields = [];
+
+    // Parties
+    if (v('brokerage')) fields.push({field_id:'BuyerBrokerCompanyName', value: v('brokerage')});
+    if (v('buyer')) fields.push({field_id:'BuyerOneName', value: v('buyer')});
+    if (v('location')) fields.push({field_id:'AddressLong', value: v('location')});
+    if (v('agent') || v('agent2')) fields.push({field_id:'BuyerAgentName', value: v('agent') || v('agent2')});
+
+    // Term
+    const effRaw = v('eff_date');
+    const termRaw = v('term_date');
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    if (effRaw) {
+      const [ey,em,ed] = effRaw.split('-');
+      fields.push({field_id:'Term1', value: `${months[parseInt(em)-1]} ${parseInt(ed)}`});
+      fields.push({field_id:'Term2', value: ey});
+    }
+    if (termRaw) {
+      const [ty,tm,td] = termRaw.split('-');
+      fields.push({field_id:'Term3', value: `${months[parseInt(tm)-1]} ${parseInt(td)}`});
+      fields.push({field_id:'Term4', value: ty});
+    }
+
+    // Compensation
+    if (document.getElementById('pct_chk').checked) fields.push({field_id:'CompensationCheck1', value:'Yes'});
+    if (v('pct_comm')) fields.push({field_id:'Compensation1', value: v('pct_comm')});
+    if (v('pct_min')) fields.push({field_id:'AcquisitionCommission', value: v('pct_min')});
+    if (document.getElementById('flat_chk').checked) fields.push({field_id:'CompensationCheck2', value:'Yes'});
+    if (v('flat_rate')) fields.push({field_id:'AcquisitionFee', value: v('flat_rate')});
+    if (document.getElementById('hourly_chk').checked) fields.push({field_id:'CompensationCheck3', value:'Yes'});
+    if (v('hourly_rate')) fields.push({field_id:'HourlyRate', value: v('hourly_rate')});
+    if (v('retainer')) fields.push({field_id:'Retainer', value: v('retainer')});
+    if (document.getElementById('ret_yes').checked) fields.push({field_id:'RetainerCheck1', value:'Yes'});
+    if (document.getElementById('ret_no').checked) fields.push({field_id:'RetainerCheck2', value:'Yes'});
+    if (v('term_fee')) fields.push({field_id:'TerminationByBuyer', value: v('term_fee')});
+
+    // Dual agency
+    if (document.getElementById('dual_yes').checked) fields.push({field_id:'ConsentCheck1', value:'Yes'});
+    if (document.getElementById('dual_no').checked) fields.push({field_id:'ConsentCheck2', value:'Yes'});
+
+    // Sig page
+    if (v('mgr_broker')) fields.push({field_id:'DesignatedManagingBrokerName', value: v('mgr_broker')});
+    if (v('agent2')) fields.push({field_id:'DesignatedAgentName', value: v('agent2')});
+    if (v('agent_mls')) fields.push({field_id:'DesignatedAgentMLSId', value: v('agent_mls')});
+    if (v('agent_ph1')) fields.push({field_id:'DesignatedAgentOnePhone', value: v('agent_ph1')});
+    if (v('agent_email')) fields.push({field_id:'DesignatedAgentEmail', value: v('agent_email')});
+    if (v('brokerage')) fields.push({field_id:'SponsoringBrokerName', value: v('brokerage')});
+    if (v('brok_phone')) fields.push({field_id:'SponsoringBrokerOfficePhone', value: v('brok_phone')});
+    if (v('brok_addr')) fields.push({field_id:'SponsoringBrokerAddress', value: v('brok_addr')});
+    if (v('brok_city')) fields.push({field_id:'SponsoringBrokerCity', value: v('brok_city')});
+    const stzip = v('brok_state_zip').split(' ');
+    if (stzip[0]) fields.push({field_id:'SponsoringBrokerState', value: stzip[0]});
+    if (stzip[1]) fields.push({field_id:'SponsoringBrokerZip', value: stzip[1]});
+    if (v('buyer1_print')) fields.push({field_id:'SellerOneName', value: v('buyer1_print')});
+    if (v('buyer2_print')) fields.push({field_id:'SellerTwoName', value: v('buyer2_print')});
+    if (v('buyer_addr')) fields.push({field_id:'SellerAddressShort', value: v('buyer_addr')});
+    if (v('buyer_csz')) {
+      fields.push({field_id:'SellerCity', value: v('buyer_csz').replace(/\s+[A-Z]{2}\s+\d+.*$/,'').trim()});
+    }
+    if (v('buyer_email1')) fields.push({field_id:'SellerOneEmail', value: v('buyer_email1')});
+    if (v('buyer_email2')) fields.push({field_id:'SellerTwoEmail', value: v('buyer_email2')});
+    if (v('date_buyer')) fields.push({field_id:'Date2', value: fmtDate(v('date_buyer'))});
+    if (v('date_brok')) fields.push({field_id:'Date3', value: fmtDate(v('date_brok'))});
+
+    await fillPDFBrowser('CAR_NEBBA_0126.pdf', fields,
+      `NEBBA_${(v('buyer')||'buyer').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30)}.pdf`);
+
+  } catch(e) {
+    console.error(e);
+    alert('PDF error: ' + e.message + '\n\nEnsure CAR_NEBBA_0126.pdf is in the same folder.');
+  }
+  btn.textContent = '⬇ Generate & Download PDF'; btn.disabled = false;
+}
+
+async function fillPDFBrowser(filename, fields, outName) {
+  if (!window.PDFLib) {
+    await new Promise((res,rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  const { PDFDocument } = window.PDFLib;
+  const res = await fetch(filename);
+  if (!res.ok) throw new Error(`Could not load ${filename}`);
+  const arrayBuf = await res.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
+  const form = pdfDoc.getForm();
+  for (const {field_id, value} of fields) {
+    try {
+      const field = form.getField(field_id);
+      if (!field) continue;
+      const type = field.constructor.name;
+      if (type === 'PDFTextField') field.setText(String(value));
+      else if (type === 'PDFCheckBox') { if (value === 'Yes') field.check(); else field.uncheck(); }
+      else if (type === 'PDFRadioGroup') { try { field.select(String(value)); } catch(e) {} }
+    } catch(e) {}
+  }
+  form.flatten();
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = outName; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function clearAll() {
+  document.querySelectorAll('input:not([type=checkbox]):not([type=radio])').forEach(i => {
+    if (!['brokerage','agent2','mgr_broker','brok_phone','brok_addr','brok_city','brok_state_zip','agent_email'].includes(i.id)) i.value='';
+  });
+  document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(i => i.checked=false);
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('date_buyer').value=today;
+  document.getElementById('date_brok').value=today;
+  updateProgress();
+}
+updateProgress();
+</script>
+</body>
+</html>

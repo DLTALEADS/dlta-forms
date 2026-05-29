@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DLTA Forms">
+<title>DLTA · Form Station</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#8B1A1A;--red-bright:#A52020;--charcoal:#3A3535;
+  --paper:#FFFFFF;--bg:#F5F3F0;--border:#DDD8D0;
+  --muted:#7A7270;--gold:#C9A84C;
+}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--charcoal);min-height:100vh}
+.topbar{background:var(--red);height:4px;width:100%}
+header{
+  background:white;border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+.logo-wrap{display:flex;align-items:center;gap:14px}
+.logo-svg{width:48px;height:36px;flex-shrink:0}
+.logo-divider{width:1.5px;height:38px;background:var(--border)}
+.logo-text .name{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.logo-text .tag{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--charcoal);margin-top:3px;display:flex;align-items:center;gap:6px}
+.logo-text .tag::before,.logo-text .tag::after{content:'';height:1px;background:currentColor;width:10px}
+.header-right{margin-left:auto;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.6}
+
+main{max-width:680px;margin:0 auto;padding:32px 16px 60px}
+
+.hero{margin-bottom:32px;text-align:center}
+.hero h1{font-family:'Fraunces',serif;font-size:28px;font-weight:300;color:var(--charcoal);line-height:1.2;margin-bottom:8px}
+.hero h1 em{font-style:italic;color:var(--red)}
+.hero p{font-size:11px;color:var(--muted);letter-spacing:.06em;line-height:1.7}
+
+.suite-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.suite-label::before,.suite-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.cards{display:grid;gap:14px}
+.form-card{
+  background:white;border:1px solid var(--border);border-radius:6px;
+  padding:20px 22px;display:flex;align-items:flex-start;gap:18px;
+  text-decoration:none;color:inherit;
+  transition:border-color .15s,box-shadow .15s;
+  cursor:pointer
+}
+.form-card:hover{border-color:var(--red);box-shadow:0 2px 12px rgba(139,26,26,.08)}
+.card-icon{
+  width:44px;height:44px;border-radius:4px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px
+}
+.card-icon.seller{background:#FDF0F0}
+.card-icon.buyer{background:#F0F4FD}
+.card-info{flex:1}
+.card-tag{font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.card-tag.seller{color:var(--red)}
+.card-tag.buyer{color:#2A5099}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--charcoal);line-height:1.2;margin-bottom:5px}
+.card-desc{font-size:10px;color:var(--muted);line-height:1.7}
+.card-meta{display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.card-meta-row{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.card-meta-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.seller .card-meta-dot{background:var(--red)}
+.buyer .card-meta-dot{background:#2A5099}
+.card-cta{margin-top:10px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:5px;transition:gap .15s}
+.form-card:hover .card-cta{gap:10px}
+.card-cta.seller{color:var(--red)}
+.card-cta.buyer{color:#2A5099}
+
+.loan-auth-link{
+  margin-top:20px;padding:14px 16px;background:#FAFAF8;border:1px solid var(--border);
+  border-radius:6px;display:flex;align-items:center;gap:12px;
+  text-decoration:none;color:inherit;transition:border-color .15s
+}
+.loan-auth-link:hover{border-color:var(--gold)}
+.loan-auth-link .la-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.loan-auth-link .la-title{font-size:13px;font-weight:600;color:var(--charcoal)}
+.loan-auth-link .la-arrow{margin-left:auto;color:var(--muted);font-size:14px}
+
+footer{text-align:center;padding:24px 16px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+footer span{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="logo-wrap">
+    <svg class="logo-svg" viewBox="0 0 80 60" fill="none">
+      <polygon points="40,2 76,54 4,54" fill="#8B1A1A"/>
+      <polygon points="40,18 62,54 18,54" fill="#A52020"/>
+      <polygon points="40,24 58,54 22,54" fill="white"/>
+      <rect x="33" y="37" width="6" height="6" fill="#3A3535"/>
+      <rect x="41" y="37" width="6" height="6" fill="#3A3535"/>
+      <rect x="33" y="45" width="6" height="6" fill="#3A3535"/>
+      <rect x="41" y="45" width="6" height="6" fill="#3A3535"/>
+    </svg>
+    <div class="logo-divider"></div>
+    <div class="logo-text">
+      <div class="name">Delta Realty Corp.</div>
+      <div class="tag">Form Station</div>
+    </div>
+  </div>
+  <div class="header-right">CAR Form Suite<br>Chicago · 2026</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Fill. Generate. <em>Print.</em></h1>
+    <p>CAR-compliant forms for every transaction stage.<br>No login. No subscription. Works on every device.</p>
+  </div>
+
+  <div class="suite-label">CAR Form Suite · Revised 2026</div>
+
+  <div class="cards">
+    <a href="dlta-listing-form.html" class="form-card seller">
+      <div class="card-icon seller">🏠</div>
+      <div class="card-info">
+        <div class="card-tag seller">Seller-Side · CAR ERS</div>
+        <div class="card-title">Exclusive Right to Sell</div>
+        <div class="card-desc">Standard listing agreement for seller representation. Required before marketing any property.</div>
+        <div class="card-meta">
+          <div class="card-meta-row"><span class="card-meta-dot seller"></span>Parties, term, marketing price</div>
+          <div class="card-meta-row"><span class="card-meta-dot seller"></span>Designated agent + compensation</div>
+          <div class="card-meta-row"><span class="card-meta-dot seller"></span>Property details + dual agency</div>
+        </div>
+        <div class="card-cta seller">Open form →</div>
+      </div>
+    </a>
+
+    <a href="dlta-buyer-rep-form.html" class="form-card buyer">
+      <div class="card-icon buyer">🔑</div>
+      <div class="card-info">
+        <div class="card-tag buyer">Buyer-Side · CAR NEBBA</div>
+        <div class="card-title">Non-Exclusive Buyer Rep</div>
+        <div class="card-desc">Required before the first showing. Non-exclusive to minimize pushback from new prospects.</div>
+        <div class="card-meta">
+          <div class="card-meta-row"><span class="card-meta-dot buyer"></span>Parties, agent, location</div>
+          <div class="card-meta-row"><span class="card-meta-dot buyer"></span>Term + compensation type</div>
+          <div class="card-meta-row"><span class="card-meta-dot buyer"></span>Dual agency consent</div>
+        </div>
+        <div class="card-cta buyer">Open form →</div>
+      </div>
+    </a>
+  </div>
+
+  <a href="https://dltaleads.github.io/dlta-loan-auth/" class="loan-auth-link" target="_blank">
+    <div>
+      <div class="la-label">Legacy Tool</div>
+      <div class="la-title">Loan Authorization Letter →</div>
+    </div>
+  </a>
+</main>
+
+<footer>Delta Realty Corp. · <span>Form Station</span> · CAR-Compliant · Chicago IL</footer>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DLTA Listing">
+<title>DLTA · Exclusive Right to Sell</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#8B1A1A;--red-bright:#A52020;--charcoal:#3A3535;
+  --bg:#F5F3F0;--border:#DDD8D0;--muted:#7A7270;
+  --field-bg:#FAFAF9;--gold:#C9A84C;
+}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--charcoal);min-height:100vh}
+.topbar{background:var(--red);height:4px}
+header{
+  background:white;border-bottom:1px solid var(--border);
+  padding:12px 20px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+.logo-svg{width:40px;height:30px;flex-shrink:0}
+.hdr-div{width:1.5px;height:32px;background:var(--border)}
+.hdr-name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--red)}
+.hdr-form{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.hdr-back{margin-left:auto;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px}
+.hdr-back:hover{color:var(--red)}
+
+main{max-width:760px;margin:0 auto;padding:20px 14px 60px}
+
+.section{background:white;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.section-hdr{padding:8px 16px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:white}
+.section-hdr.red{background:var(--red)}
+.section-hdr.dark{background:#5A1010}
+.section-hdr.gray{background:var(--charcoal)}
+.section-body{padding:16px}
+
+.fields{display:grid;gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.field input,.field select{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  background:var(--field-bg);border:1.5px solid var(--border);
+  border-radius:4px;padding:9px 11px;color:var(--charcoal);
+  transition:border-color .15s,box-shadow .15s;width:100%;-webkit-appearance:none
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(139,26,26,.08);background:white}
+.field input::placeholder{color:#C8C2BA}
+
+.check-row{display:flex;align-items:center;gap:8px;padding:6px 0}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);flex-shrink:0}
+.check-row label{font-size:11px;color:var(--charcoal);cursor:pointer;line-height:1.4}
+
+.check-group{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 0}
+.check-item{display:flex;align-items:center;gap:6px}
+.check-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--red)}
+.check-item label{font-size:10px;color:var(--charcoal);cursor:pointer}
+
+.radio-group{display:flex;gap:20px;padding:6px 0}
+.radio-item{display:flex;align-items:center;gap:6px}
+.radio-item input[type=radio]{width:14px;height:14px;accent-color:var(--red)}
+.radio-item label{font-size:11px;color:var(--charcoal);cursor:pointer}
+
+.defaults-note{font-size:9.5px;color:var(--muted);padding:7px 10px;background:#FBF9F7;border-left:3px solid var(--gold);border-radius:0 3px 3px 0;margin-bottom:10px;line-height:1.5}
+.section-note{font-size:9px;color:var(--muted);padding:8px 0 4px;line-height:1.6}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.btn{
+  font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:600;padding:13px 16px;
+  border-radius:4px;border:none;cursor:pointer;transition:all .15s;flex:1
+}
+.btn-red{background:var(--red);color:white}
+.btn-red:hover{background:var(--red-bright)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border);flex:none;padding:13px 14px}
+.btn-ghost:hover{border-color:var(--red);color:var(--red)}
+.btn-dl{background:#1A4A2E;color:white;font-size:10px}
+.btn-dl:hover{background:#1F5A38}
+.btn-dl:active{transform:scale(.98)}
+
+.progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.progress-bar{height:100%;background:var(--red);border-radius:2px;transition:width .3s}
+
+@media(max-width:520px){.two,.three,.four{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <svg class="logo-svg" viewBox="0 0 80 60" fill="none">
+    <polygon points="40,2 76,54 4,54" fill="#8B1A1A"/>
+    <polygon points="40,18 62,54 18,54" fill="#A52020"/>
+    <polygon points="40,24 58,54 22,54" fill="white"/>
+    <rect x="33" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="33" y="45" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="45" width="6" height="6" fill="#3A3535"/>
+  </svg>
+  <div class="hdr-div"></div>
+  <div>
+    <div class="hdr-name">Delta Realty Corp.</div>
+    <div class="hdr-form">Exclusive Right to Sell · CAR ERS 02.2026</div>
+  </div>
+  <a href="index.html" class="hdr-back">← All Forms</a>
+</header>
+
+<main>
+  <div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="btn-row">
+    <button class="btn btn-red" onclick="generatePDF()">⬇ Generate &amp; Download PDF</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+  </div>
+
+  <!-- SECTION 1: PARTIES -->
+  <div class="section">
+    <div class="section-hdr red">1 · Parties</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Brokerage Name</label><input id="brokerage" value="Delta Realty Corp." placeholder="Delta Realty Corp."></div>
+          <div class="field"><label>Seller Name(s)</label><input id="seller" placeholder="John Doe &amp; Jane Doe"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: TERM -->
+  <div class="section">
+    <div class="section-hdr red">2 · Term</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="four">
+          <div class="field"><label>Effective Date</label><input id="eff_date" type="date"></div>
+          <div class="field"><label>Eff. Year</label><input id="eff_year" placeholder="2026" maxlength="4"></div>
+          <div class="field"><label>Termination Date</label><input id="term_date" type="date"></div>
+          <div class="field"><label>Term. Year</label><input id="term_year" placeholder="2026" maxlength="4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: PRICE -->
+  <div class="section">
+    <div class="section-hdr red">3 · Price</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="three">
+          <div class="field"><label>Marketing Price $</label><input id="price1" placeholder="350000"></div>
+          <div class="field"><label>Price Change Date</label><input id="price2" placeholder="December 31"></div>
+          <div class="field"><label>Price Change Year</label><input id="price3" placeholder="2026" maxlength="4"></div>
+        </div>
+        <div class="field"><label>Reduced Price $ (if not accepted by above date)</label><input id="price4" placeholder="335000"></div>
+        <div class="check-row"><input type="checkbox" id="price_check"><label for="price_check">Also market for lease — fill rental price fields</label></div>
+        <div class="three" id="rental-fields" style="display:none">
+          <div class="field"><label>Rental Price $/mo</label><input id="price5" placeholder="2500"></div>
+          <div class="field"><label>Rental Change Date</label><input id="price6" placeholder="December 31"></div>
+          <div class="field"><label>Rental Change $/mo</label><input id="price7" placeholder="2400"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PROPERTY -->
+  <div class="section">
+    <div class="section-hdr red">4 · Property</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Street Address</label><input id="address" placeholder="930 E 166th Pl"></div>
+          <div class="field"><label>Unit Number</label><input id="unit" placeholder="— or blank"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>City</label><input id="city" placeholder="South Holland"></div>
+          <div class="field"><label>State</label><input id="state" placeholder="IL" maxlength="2"></div>
+          <div class="field"><label>Zip Code</label><input id="zip" placeholder="60473" maxlength="10"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Parking Space #</label><input id="parking_num" placeholder="—"></div>
+          <div class="field"><label>Storage Space #</label><input id="storage_num" placeholder="—"></div>
+        </div>
+        <div>
+          <div style="font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Parking Type</div>
+          <div class="check-group">
+            <div class="check-item"><input type="checkbox" id="pk1"><label for="pk1">Deeded</label></div>
+            <div class="check-item"><input type="checkbox" id="pk2"><label for="pk2">Limited Common Element</label></div>
+            <div class="check-item"><input type="checkbox" id="pk3"><label for="pk3">Assigned</label></div>
+            <div class="check-item"><input type="checkbox" id="pk4"><label for="pk4">Indoor</label></div>
+            <div class="check-item"><input type="checkbox" id="pk5"><label for="pk5">Outdoor</label></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Storage Type</div>
+          <div class="check-group">
+            <div class="check-item"><input type="checkbox" id="st1"><label for="st1">Deeded</label></div>
+            <div class="check-item"><input type="checkbox" id="st2"><label for="st2">Limited Common Element</label></div>
+            <div class="check-item"><input type="checkbox" id="st3"><label for="st3">Assigned</label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: DESIGNATED AGENT -->
+  <div class="section">
+    <div class="section-hdr red">6 · Designated Agent</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="field"><label>Designated Agent Name</label><input id="agent" placeholder="Tom Mackrola"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8C: LOCK BOX -->
+  <div class="section">
+    <div class="section-hdr gray">8C · Lock Box</div>
+    <div class="section-body">
+      <div class="section-note">Seller authorizes Brokerage to place a lock box on the Property:</div>
+      <div class="radio-group">
+        <div class="radio-item"><input type="radio" name="lockbox" id="lb_yes" value="yes"><label for="lb_yes">Does authorize</label></div>
+        <div class="radio-item"><input type="radio" name="lockbox" id="lb_no" value="no"><label for="lb_no">Does not authorize</label></div>
+      </div>
+      <div class="field" style="margin-top:8px"><label>Additional Unlicensed Individuals Authorized</label><input id="lockbox_text" placeholder="e.g. photographer, unlicensed assistant"></div>
+    </div>
+  </div>
+
+  <!-- SECTION 11: COMPENSATION -->
+  <div class="section">
+    <div class="section-hdr red">11 · Listing Brokerage Compensation</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="check-row"><input type="checkbox" id="listing_fee_chk"><label for="listing_fee_chk">Upfront Listing Fee applies</label></div>
+        <div class="field"><label>Listing Fee $ (if applicable)</label><input id="listing_fee" placeholder="0.00"></div>
+        <div class="check-row"><input type="checkbox" id="pct_chk"><label for="pct_chk">A. Percentage Commission</label></div>
+        <div class="two">
+          <div class="field"><label>Commission %</label><input id="pct_comm" placeholder="2.5"></div>
+          <div class="field"><label>Plus $ Amount</label><input id="pct_plus" placeholder="0.00"></div>
+        </div>
+        <div class="check-row"><input type="checkbox" id="flat_chk"><label for="flat_chk">B. Flat Rate</label></div>
+        <div class="field"><label>Flat Rate $</label><input id="flat_rate" placeholder="0.00"></div>
+        <div class="check-row"><input type="checkbox" id="unrp_chk"><label for="unrp_chk">C. Unrepresented Buyer Compensation</label></div>
+        <div class="two">
+          <div class="field"><label>Unrep. Buyer %</label><input id="buyer_comp1" placeholder="1.0"></div>
+          <div class="field"><label>Plus $ Amount</label><input id="buyer_comp2" placeholder="0.00"></div>
+        </div>
+        <div class="field"><label>Early Termination Fee $</label><input id="term_fee" placeholder="500.00"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 14: DUAL AGENCY -->
+  <div class="section">
+    <div class="section-hdr gray">14 · Dual Agency Consent</div>
+    <div class="section-body">
+      <div class="section-note">Seller consents to designated agent acting as dual agent:</div>
+      <div class="radio-group">
+        <div class="radio-item"><input type="radio" name="dual" id="dual_yes" value="yes"><label for="dual_yes">Yes — Prior Consent to Dual Agency</label></div>
+        <div class="radio-item"><input type="radio" name="dual" id="dual_no" value="no"><label for="dual_no">No — Do not consent</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 15: ADDITIONAL TERMS -->
+  <div class="section">
+    <div class="section-hdr dark">15 · Property Information</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="three">
+          <div class="field"><label>Property PIN</label><input id="pin1" placeholder="29-01-123-456-0000"></div>
+          <div class="field"><label>Tax Year</label><input id="tax_year" placeholder="2024" maxlength="4"></div>
+          <div class="field"><label>RE Tax Amount $</label><input id="tax_amt" placeholder="6500.00"></div>
+        </div>
+        <div class="check-group">
+          <div class="check-item"><input type="checkbox" id="tt8"><label for="tt8">Homeowner's Exemption</label></div>
+          <div class="check-item"><input type="checkbox" id="tt9"><label for="tt9">Senior Citizen's Exemption</label></div>
+          <div class="check-item"><input type="checkbox" id="tt10"><label for="tt10">Senior Freeze Exemption</label></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Approx Square Feet</label><input id="sqft" placeholder="1400"></div>
+          <div class="field"><label>Circumstances Affecting Title</label><input id="title_issues" placeholder="None"></div>
+        </div>
+        <div class="check-row"><input type="checkbox" id="leased_chk"><label for="leased_chk">Property is currently leased</label></div>
+        <div class="three" id="lease-fields" style="display:none">
+          <div class="field"><label>Lease Expiration</label><input id="lease_exp" type="date"></div>
+          <div class="field"><label>Rent $/mo</label><input id="rent_amt" placeholder="1800"></div>
+          <div class="field"><label>Security Deposit $</label><input id="sec_dep" placeholder="1800"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 15E: CONDO/HOA -->
+  <div class="section">
+    <div class="section-hdr dark">15E · Condo / HOA (if applicable)</div>
+    <div class="section-body">
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Management Contact</label><input id="mgmt_contact" placeholder="ABC Management Co."></div>
+          <div class="field"><label>Management Phone</label><input id="mgmt_phone" placeholder="(312) 555-1234"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Management Email</label><input id="mgmt_email" placeholder="manager@example.com"></div>
+          <div class="field"><label>Monthly Assessment $</label><input id="monthly_assess" placeholder="450.00"></div>
+        </div>
+        <div class="field"><label>Assessment Includes</label><input id="assess_includes" placeholder="Heat, water, trash, common areas"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: AGENT/BROKERAGE INFO -->
+  <div class="section">
+    <div class="section-hdr red">Agent &amp; Brokerage Info</div>
+    <div class="section-body">
+      <div class="defaults-note">Pre-filled with DLTA defaults — edit as needed.</div>
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label>Designated Agent Name</label><input id="agent2" value="Tom Mackrola" placeholder="Tom Mackrola"></div>
+          <div class="field"><label>Agent MLS ID</label><input id="agent_mls" placeholder="12345"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Agent Phone 1</label><input id="agent_ph1" placeholder="(708) 555-1234"></div>
+          <div class="field"><label>Agent Email</label><input id="agent_email" value="tom@deltarealtychi.com" placeholder="tom@deltarealtychi.com"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Managing Broker Name</label><input id="mgr_broker" value="George Filippidis" placeholder="George Filippidis"></div>
+          <div class="field"><label>Brokerage Office Phone</label><input id="brok_phone" value="(708) 425-1000" placeholder="(708) 425-1000"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>Brokerage Address</label><input id="brok_addr" value="4949 W 95th St" placeholder="4949 W 95th St"></div>
+          <div class="field"><label>City</label><input id="brok_city" value="Oak Lawn" placeholder="Oak Lawn"></div>
+          <div class="field"><label>State / Zip</label><input id="brok_state_zip" value="IL 60453" placeholder="IL 60453"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Seller 1 Name (print)</label><input id="sel1_print" placeholder="John Doe"></div>
+          <div class="field"><label>Seller 2 Name (print, if any)</label><input id="sel2_print" placeholder="Jane Doe"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Seller Address</label><input id="sel_addr" placeholder="930 E 166th Pl"></div>
+          <div class="field"><label>Seller City / State / Zip</label><input id="sel_csz" placeholder="South Holland IL 60473"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Seller Email 1</label><input id="sel_email1" placeholder="seller@email.com"></div>
+          <div class="field"><label>Seller Email 2 (if any)</label><input id="sel_email2" placeholder=""></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Signing Date (Seller)</label><input id="date_seller" type="date"></div>
+          <div class="field"><label>Signing Date (Brokerage)</label><input id="date_brok" type="date"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-red" onclick="generatePDF()">⬇ Generate &amp; Download PDF</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+  </div>
+</main>
+
+<script>
+// Progress bar
+function updateProgress() {
+  const inputs = document.querySelectorAll('input:not([type=checkbox]):not([type=radio])');
+  const filled = Array.from(inputs).filter(i => i.value.trim()).length;
+  document.getElementById('progress-bar').style.width = Math.round(filled/inputs.length*100)+'%';
+}
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateProgress));
+
+// Toggle rental fields
+document.getElementById('price_check').addEventListener('change', function() {
+  document.getElementById('rental-fields').style.display = this.checked ? 'grid' : 'none';
+});
+// Toggle lease fields
+document.getElementById('leased_chk').addEventListener('change', function() {
+  document.getElementById('lease-fields').style.display = this.checked ? 'grid' : 'none';
+});
+
+// Set today as default signing dates
+const today = new Date().toISOString().slice(0,10);
+document.getElementById('date_seller').value = today;
+document.getElementById('date_brok').value = today;
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function fmtDate(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+}
+
+async function generatePDF() {
+  const btn = document.querySelector('.btn-red');
+  btn.textContent = 'Generating...'; btn.disabled = true;
+
+  try {
+    // Build field values for the CAR PDF
+    const fields = [];
+
+    // Parties
+    if (v('brokerage')) fields.push({field_id:'DesignatedAgent', value: v('agent') || v('agent2')});
+
+    // Term
+    const effRaw = v('eff_date');
+    const termRaw = v('term_date');
+    if (effRaw) {
+      const [ey,em,ed] = effRaw.split('-');
+      const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+      fields.push({field_id:'EffectiveDate1', value: `${months[parseInt(em)-1]} ${parseInt(ed)}`});
+      fields.push({field_id:'EffectiveDate2', value: ey});
+    }
+    if (termRaw) {
+      const [ty,tm,td] = termRaw.split('-');
+      const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+      fields.push({field_id:'TerminationDate1', value: `${months[parseInt(tm)-1]} ${parseInt(td)}`});
+      fields.push({field_id:'TerminationDate2', value: ty});
+    }
+
+    // Price
+    if (v('price1')) fields.push({field_id:'Price1', value: v('price1')});
+    if (v('price2')) fields.push({field_id:'Price2', value: v('price2')});
+    if (v('price3')) fields.push({field_id:'Price3', value: v('price3')});
+    if (v('price4')) fields.push({field_id:'Price4', value: v('price4')});
+    if (document.getElementById('price_check').checked) {
+      fields.push({field_id:'PriceCheck', value: 'Yes'});
+      if (v('price5')) fields.push({field_id:'Price5', value: v('price5')});
+      if (v('price7')) fields.push({field_id:'Price7', value: v('price7')});
+    }
+
+    // Property
+    if (v('address')) fields.push({field_id:'AddressLong', value: v('address')});
+    if (v('unit')) fields.push({field_id:'UnitNumber', value: v('unit')});
+    if (v('city')) fields.push({field_id:'City', value: v('city')});
+    if (v('state')) fields.push({field_id:'State', value: v('state')});
+    if (v('zip')) fields.push({field_id:'PostalCode', value: v('zip')});
+    if (v('parking_num')) fields.push({field_id:'ParkingSpaceNumber', value: v('parking_num')});
+    if (v('storage_num')) fields.push({field_id:'StorageSpaceNumber', value: v('storage_num')});
+    // Parking checkboxes
+    const pkMap = {pk1:'ParkingSpaceCheck1',pk2:'ParkingSpaceCheck2',pk3:'ParkingSpaceCheck3',pk4:'ParkingSpaceCheck4',pk5:'ParkingSpaceCheck5'};
+    Object.entries(pkMap).forEach(([id,fid]) => { if(document.getElementById(id).checked) fields.push({field_id:fid, value:'Yes'}); });
+    const stMap = {st1:'StorageSpaceCheck1',st2:'StorageSpaceCheck2',st3:'StorageSpaceCheck3'};
+    Object.entries(stMap).forEach(([id,fid]) => { if(document.getElementById(id).checked) fields.push({field_id:fid, value:'Yes'}); });
+
+    // Lock box
+    const lbYes = document.getElementById('lb_yes').checked;
+    const lbNo = document.getElementById('lb_no').checked;
+    if (lbYes) fields.push({field_id:'LockBoxCheck1', value:'Yes'});
+    if (lbNo) fields.push({field_id:'LockBoxCheck2', value:'Yes'});
+    if (v('lockbox_text')) fields.push({field_id:'LockBox', value: v('lockbox_text')});
+
+    // Compensation
+    if (document.getElementById('listing_fee_chk').checked) fields.push({field_id:'ListingFeeCheck1', value:'Yes'});
+    if (v('listing_fee')) fields.push({field_id:'ListingFee', value: v('listing_fee')});
+    if (document.getElementById('pct_chk').checked) fields.push({field_id:'BrokerageCompensationCheck1', value:'Yes'});
+    if (v('pct_comm')) fields.push({field_id:'PercentCommission', value: v('pct_comm')});
+    if (v('pct_plus')) fields.push({field_id:'Compensation2', value: v('pct_plus')});
+    if (document.getElementById('flat_chk').checked) fields.push({field_id:'CompensationCheck2', value:'Yes'});
+    if (document.getElementById('unrp_chk').checked) fields.push({field_id:'CompensationCheck3', value:'Yes'});
+    if (v('buyer_comp1')) fields.push({field_id:'BuyerComp1', value: v('buyer_comp1')});
+    if (v('buyer_comp2')) fields.push({field_id:'BuyerComp2', value: v('buyer_comp2')});
+    if (v('term_fee')) fields.push({field_id:'TerminationOfAgreement', value: v('term_fee')});
+
+    // Dual agency
+    const dualYes = document.getElementById('dual_yes').checked;
+    const dualNo = document.getElementById('dual_no').checked;
+    if (dualYes) fields.push({field_id:'DualAgencyCheck1', value:'Yes'});
+    if (dualNo) fields.push({field_id:'DualAgencyCheck2', value:'Yes'});
+
+    // Property info
+    if (v('pin1')) fields.push({field_id:'Pin1', value: v('pin1')});
+    if (v('tax_year')) fields.push({field_id:'TaxesYear', value: v('tax_year')});
+    if (v('tax_amt')) fields.push({field_id:'TaxesAmount', value: v('tax_amt')});
+    if (v('sqft')) fields.push({field_id:'ApproxSqFt', value: v('sqft')});
+    if (v('title_issues')) fields.push({field_id:'TransferOfTitle', value: v('title_issues')});
+    if (document.getElementById('leased_chk').checked) {
+      if (v('lease_exp')) fields.push({field_id:'LeaseExpirationDate', value: fmtDate(v('lease_exp'))});
+      if (v('rent_amt')) fields.push({field_id:'RentAmount', value: v('rent_amt')});
+    }
+    if (v('mgmt_contact')) fields.push({field_id:'ManagementContact', value: v('mgmt_contact')});
+    if (v('mgmt_phone')) fields.push({field_id:'ManagerPhone', value: v('mgmt_phone')});
+    if (v('mgmt_email')) fields.push({field_id:'ManagerEmail', value: v('mgmt_email')});
+    if (v('monthly_assess')) fields.push({field_id:'MonthlyAssessment', value: v('monthly_assess')});
+    if (v('assess_includes')) fields.push({field_id:'AssessmentIncludes', value: v('assess_includes')});
+
+    // Agent/brokerage signature page
+    if (v('mgr_broker')) fields.push({field_id:'DesignatedManagingBrokerName', value: v('mgr_broker')});
+    if (v('agent2')) fields.push({field_id:'BuyerAgentName', value: v('agent2')});
+    if (v('agent_mls')) fields.push({field_id:'BuyerAgentMLSId', value: v('agent_mls')});
+    if (v('agent_ph1')) fields.push({field_id:'BuyerAgentOnePhone', value: v('agent_ph1')});
+    if (v('agent_email')) fields.push({field_id:'BuyerAgentEmail', value: v('agent_email')});
+    if (v('brok_phone')) fields.push({field_id:'BuyerBrokerCompanyOfficePhone', value: v('brok_phone')});
+    if (v('brok_addr')) fields.push({field_id:'BuyerBrokerCompanyAddress', value: v('brok_addr')});
+    if (v('brok_city')) fields.push({field_id:'BuyerBrokerCompanyCity', value: v('brok_city')});
+    const stzip = v('brok_state_zip').split(' ');
+    if (stzip[0]) fields.push({field_id:'BuyerBrokerCompanyState', value: stzip[0]});
+    if (stzip[1]) fields.push({field_id:'BuyerBrokerCompanyPostalCode', value: stzip[1]});
+    if (v('sel1_print')) fields.push({field_id:'SellerTwoName', value: v('sel1_print')});
+    if (v('sel2_print')) fields.push({field_id:'SellerLegalAgent1', value: v('sel2_print')});
+    if (v('sel_addr')) fields.push({field_id:'SellerAddress', value: v('sel_addr')});
+    const csz = v('sel_csz').split(' ');
+    if (v('sel_csz')) {
+      fields.push({field_id:'SellerCity', value: v('sel_csz').replace(/\s+[A-Z]{2}\s+\d+.*$/,'').trim()});
+    }
+    if (v('sel_email1')) fields.push({field_id:'SellerOneEmail', value: v('sel_email1')});
+    if (v('sel_email2')) fields.push({field_id:'SellerTwoEmail', value: v('sel_email2')});
+    if (v('date_seller')) fields.push({field_id:'Date2', value: fmtDate(v('date_seller'))});
+    if (v('date_brok')) fields.push({field_id:'Date3', value: fmtDate(v('date_brok'))});
+
+    // Send to server-side filler via fetch to /api/fill — 
+    // Since we're static, use pdf-lib in browser via CDN
+    await fillPDFBrowser('CAR_ERS_0426.pdf', fields, 
+      `ERS_${(v('address')||'listing').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30)}.pdf`);
+
+  } catch(e) {
+    console.error(e);
+    alert('PDF error: ' + e.message + '\n\nTry downloading the blank PDF and filling manually.');
+  }
+  btn.textContent = '⬇ Generate & Download PDF'; btn.disabled = false;
+}
+
+async function fillPDFBrowser(filename, fields, outName) {
+  // Load pdf-lib from CDN
+  if (!window.PDFLib) {
+    await new Promise((res,rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  const { PDFDocument } = window.PDFLib;
+
+  const res = await fetch(filename);
+  if (!res.ok) throw new Error(`Could not load ${filename} — make sure it's in the same folder.`);
+  const arrayBuf = await res.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
+  const form = pdfDoc.getForm();
+
+  for (const {field_id, value} of fields) {
+    try {
+      const field = form.getField(field_id);
+      if (!field) continue;
+      const type = field.constructor.name;
+      if (type === 'PDFTextField') {
+        field.setText(String(value));
+      } else if (type === 'PDFCheckBox') {
+        if (value === 'Yes' || value === true) field.check();
+        else field.uncheck();
+      } else if (type === 'PDFRadioGroup') {
+        try { field.select(String(value)); } catch(e) {}
+      }
+    } catch(e) { /* field not found, skip */ }
+  }
+
+  form.flatten();
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = outName; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function clearAll() {
+  document.querySelectorAll('input:not([type=checkbox]):not([type=radio])').forEach(i => {
+    if (!['brokerage','agent2','mgr_broker','brok_phone','brok_addr','brok_city','brok_state_zip','agent_email'].includes(i.id)) i.value='';
+  });
+  document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(i => i.checked=false);
+  document.getElementById('rental-fields').style.display='none';
+  document.getElementById('lease-fields').style.display='none';
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('date_seller').value=today;
+  document.getElementById('date_brok').value=today;
+  updateProgress();
+}
+
+updateProgress();
+</script>
+</body>
+</html>
