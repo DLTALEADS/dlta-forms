@@ -556,7 +556,7 @@ async function fillPDFBrowser(filename, fields, outName) {
     } catch(e) { /* field not found, skip */ }
   }
 
-  form.flatten();
+  
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], {type:'application/pdf'});
   const url = URL.createObjectURL(blob);

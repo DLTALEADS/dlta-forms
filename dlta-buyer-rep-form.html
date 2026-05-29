@@ -351,7 +351,7 @@ async function fillPDFBrowser(filename, fields, outName) {
       else if (type === 'PDFRadioGroup') { try { field.select(String(value)); } catch(e) {} }
     } catch(e) {}
   }
-  form.flatten();
+  
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], {type:'application/pdf'});
   const url = URL.createObjectURL(blob);
