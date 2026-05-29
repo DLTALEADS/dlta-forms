@@ -389,79 +389,110 @@ const NEBBA_FIELDS = {
   "SellerTwoEmail": {"page": 6, "x": 98.43, "y": 338.99, "w": 191.61, "h": 14.4, "fs": 9},
 };
 
-// Shared PDF overlay engine - uses pdf.js to render pages + jsPDF to overlay text
-// No server needed. Works from GitHub Pages.
 
-async function loadLib(src) {
-  if (document.querySelector(`script[src="${src}"]`)) return;
+Object.assign(NEBBA_FIELDS, {
+  "CompensationCheck1": {"page": 3, "x": 41.5, "y": 82.0, "w": 9, "h": 9, "fs": 9, "check": true},
+  "CompensationCheck2": {"page": 3, "x": 41.5, "y": 184.5, "w": 9, "h": 9, "fs": 9, "check": true},
+  "CompensationCheck3": {"page": 3, "x": 41.5, "y": 257.0, "w": 9, "h": 9, "fs": 9, "check": true},
+  "RetainerCheck1": {"page": 3, "x": 331.0, "y": 558.0, "w": 9, "h": 9, "fs": 9, "check": true},
+  "RetainerCheck2": {"page": 3, "x": 420.0, "y": 558.0, "w": 9, "h": 9, "fs": 9, "check": true},
+  "ConsentCheck1": {"page": 5, "x": 41.5, "y": 516.0, "w": 9, "h": 9, "fs": 9, "check": true},
+  "ConsentCheck2": {"page": 5, "x": 41.5, "y": 573.0, "w": 9, "h": 9, "fs": 9, "check": true}
+});
+
+
+// Shared PDF overlay engine - writes directly onto the original PDF with pdf-lib.
+// This avoids the blank-output problem caused by browser canvas/jsPDF rendering quirks.
+// No server needed. Works from GitHub Pages as long as the PDF sits beside this HTML file.
+
+async function loadLib(src, globalName) {
+  if (globalName && window[globalName]) return;
+  if (document.querySelector(`script[src="${src}"]`)) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return;
+  }
   return new Promise((res, rej) => {
     const s = document.createElement('script');
-    s.src = src; s.onload = res; s.onerror = rej;
+    s.src = src;
+    s.onload = res;
+    s.onerror = () => rej(new Error(`Could not load ${src}`));
     document.head.appendChild(s);
   });
 }
 
+function _pdfText(pdfFont, rawText, size, maxWidth) {
+  let text = String(rawText ?? '').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  const safe = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014]/g, '-');
+  text = safe;
+  if (pdfFont.widthOfTextAtSize(text, size) <= maxWidth) return text;
+  while (text.length > 1 && pdfFont.widthOfTextAtSize(text + '...', size) > maxWidth) {
+    text = text.slice(0, -1);
+  }
+  return text.length > 1 ? text + '...' : '';
+}
+
+function _isCheckedValue(value) {
+  return /^(yes|true|x|checked|1)$/i.test(String(value ?? '').trim());
+}
+
 async function fillPDFOverlay(pdfFilename, fieldValues, coordMap, outputFilename) {
-  // Load libraries
-  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js', 'PDFLib');
 
-  const { jsPDF } = window.jspdf;
-  const pdfjsLib = window.pdfjsLib;
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
 
-  // Fetch original PDF
-  const resp = await fetch(pdfFilename);
-  if (!resp.ok) throw new Error(`Cannot load ${pdfFilename}`);
+  const resp = await fetch(pdfFilename, { cache: 'no-store' });
+  if (!resp.ok) throw new Error(`Cannot load ${pdfFilename}. Make sure it is uploaded beside this HTML file.`);
+
   const arrayBuf = await resp.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const pages = pdfDoc.getPages();
 
-  // Load with pdf.js
-  const pdfDoc = await pdfjsLib.getDocument({data: arrayBuf}).promise;
-  const numPages = pdfDoc.numPages;
+  for (const [fieldId, coordsRaw] of Object.entries(coordMap)) {
+    const value = fieldValues[fieldId];
+    if (value === undefined || value === null || String(value).trim() === '') continue;
 
-  // Create output jsPDF doc (letter size)
-  const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+    const coordList = Array.isArray(coordsRaw) ? coordsRaw : [coordsRaw];
+    for (const coords of coordList) {
+      const pageIndex = Number(coords.page) - 1;
+      if (!pages[pageIndex]) continue;
+      const page = pages[pageIndex];
+      const { height } = page.getSize();
+      const fs = Number(coords.fs || 9);
+      const x = Number(coords.x || 0) + 1;
+      const y = height - Number(coords.y || 0) - Number(coords.h || fs) + 2;
+      const maxW = Math.max(5, Number(coords.w || 80) - 2);
+      const isCheck = coords.check === true || /check/i.test(fieldId) || Number(coords.w || 0) <= 12;
 
-  for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-    if (pageNum > 1) doc.addPage('letter', 'portrait');
-
-    // Render PDF page to canvas at 2x for crisp output
-    const page = await pdfDoc.getPage(pageNum);
-    const scale = 2.0;
-    const viewport = page.getViewport({ scale });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const ctx = canvas.getContext('2d');
-    await page.render({ canvasContext: ctx, viewport }).promise;
-
-    // Add as background image (full page)
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    doc.addImage(imgData, 'JPEG', 0, 0, 612, 792);
-
-    // Overlay text fields for this page
-    for (const [fieldId, coords] of Object.entries(coordMap)) {
-      if (coords.page !== pageNum) continue;
-      const val = fieldValues[fieldId];
-      if (!val) continue;
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(coords.fs);
-      doc.setTextColor(0, 0, 0);
-
-      // Clip text to field width
-      const maxW = coords.w - 2;
-      const text = String(val);
-      // y is from top of page to top of field; text baseline is at bottom of field
-      const textY = coords.y + coords.h - 2;
-      doc.text(text, coords.x + 1, textY, { maxWidth: maxW });
+      if (isCheck && _isCheckedValue(value)) {
+        const markSize = Number(coords.markSize || Math.max(9, fs + 2));
+        page.drawText('X', {
+          x: Number(coords.x || 0) + 1.8,
+          y: height - Number(coords.y || 0) - Number(coords.h || markSize) + 1.2,
+          size: markSize,
+          font,
+          color: rgb(0, 0, 0),
+        });
+      } else {
+        const text = _pdfText(font, value, fs, maxW);
+        if (!text) continue;
+        page.drawText(text, { x, y, size: fs, font, color: rgb(0, 0, 0), maxWidth: maxW });
+      }
     }
   }
 
-  doc.save(outputFilename);
+  const pdfBytes = await pdfDoc.save({ useObjectStreams: false });
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = outputFilename || 'filled-form.pdf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
-
 
 function clearAll() {
   document.querySelectorAll('input:not([type=checkbox]):not([type=radio])').forEach(i => {
