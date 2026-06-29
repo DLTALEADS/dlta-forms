@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DLTA Offer">
+<title>DLTA · Offer to Purchase</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#8B1A1A;--red-bright:#A52020;--charcoal:#3A3535;
+  --bg:#F5F3F0;--border:#DDD8D0;--muted:#7A7270;
+  --field-bg:#FAFAF9;--gold:#C9A84C;
+  --blue:#2A5099;--green:#1A6B3A;
+}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--charcoal);min-height:100vh}
+.topbar{background:var(--red);height:4px}
+header{
+  background:white;border-bottom:1px solid var(--border);
+  padding:12px 20px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)
+}
+.logo-svg{width:40px;height:30px;flex-shrink:0}
+.hdr-div{width:1.5px;height:32px;background:var(--border)}
+.hdr-name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--red)}
+.hdr-form{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.hdr-back{margin-left:auto;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px}
+.hdr-back:hover{color:var(--red)}
+
+/* Progress */
+.progress-wrap{background:white;border-bottom:1px solid var(--border);padding:10px 20px 12px}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:6px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-bar{height:100%;background:var(--red);border-radius:2px;transition:width .35s}
+
+main{max-width:640px;margin:0 auto;padding:24px 14px 80px}
+
+/* Step system */
+.step{display:none}
+.step.active{display:block}
+
+.step-hero{margin-bottom:24px}
+.step-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600;margin-bottom:6px}
+.step-title{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:var(--charcoal);line-height:1.25;margin-bottom:6px}
+.step-hint{font-size:10px;color:var(--muted);line-height:1.7}
+
+/* Cards */
+.card{background:white;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.card-hdr{padding:8px 16px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:white;background:var(--red)}
+.card-hdr.blue{background:var(--blue)}
+.card-hdr.dark{background:#5A1010}
+.card-body{padding:16px}
+
+/* Fields */
+.fields{display:grid;gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.field input,.field select{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  background:var(--field-bg);border:1.5px solid var(--border);
+  border-radius:4px;padding:9px 11px;color:var(--charcoal);
+  transition:border-color .15s,box-shadow .15s;width:100%;-webkit-appearance:none
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(139,26,26,.08);background:white}
+.field input::placeholder{color:#C8C2BA}
+.field input.err{border-color:#B91C1C}
+
+/* Option tiles */
+.tiles{display:grid;gap:8px}
+.tiles.cols2{grid-template-columns:1fr 1fr}
+.tile{
+  border:1.5px solid var(--border);border-radius:5px;padding:12px 14px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.tile:hover{border-color:var(--muted)}
+.tile.selected{border-color:var(--red);background:#FDF5F5}
+.tile input[type=radio]{margin-top:2px;width:14px;height:14px;accent-color:var(--red);flex-shrink:0}
+.tile-label{font-size:12px;font-weight:600;color:var(--charcoal);line-height:1.3}
+.tile-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+/* Nav */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.btn{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:13px 20px;border-radius:4px;border:none;cursor:pointer;transition:all .15s}
+.btn-red{background:var(--red);color:white}
+.btn-red:hover{background:var(--red-bright)}
+.btn-red:active{transform:scale(.98)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--red);color:var(--red)}
+
+/* Conditional block */
+.cond{display:none;background:#FAFAF8;border:1px solid var(--border);border-radius:5px;padding:16px;margin-top:12px}
+.cond.show{display:block}
+.cond-title{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+
+/* Note */
+.note{font-size:9.5px;color:var(--muted);padding:8px 10px;background:#FBF9F7;border-left:3px solid var(--gold);border-radius:0 3px 3px 0;line-height:1.5;margin-bottom:10px}
+
+/* Summary */
+.summary{background:white;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.summary-row{display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.summary-row:last-child{border-bottom:none}
+.s-key{color:var(--muted)}
+.s-val{font-weight:600;text-align:right;max-width:60%}
+.summary-hdr{padding:7px 14px;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:white;background:var(--charcoal)}
+
+/* Error */
+.err-msg{font-size:9.5px;color:#B91C1C;margin-top:4px;display:none}
+.err-msg.show{display:block}
+
+/* Generate state */
+.generating{text-align:center;padding:40px 0}
+.gen-icon{font-size:40px;margin-bottom:14px;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-msg{font-size:11px;color:var(--muted);line-height:1.7}
+
+/* Success state */
+.success{text-align:center;padding:36px 0;display:none}
+.success-check{width:60px;height:60px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:white}
+.success h2{font-family:'Fraunces',serif;font-size:24px;font-weight:300;margin-bottom:8px}
+.success p{font-size:10px;color:var(--muted);line-height:1.7;max-width:360px;margin:0 auto 24px}
+.btn-dl{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:white;padding:14px 24px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border:none;cursor:pointer;transition:opacity .15s;text-decoration:none}
+.btn-dl:hover{opacity:.88}
+.btn-dl:active{transform:scale(.98)}
+.restart-link{display:block;margin-top:16px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.restart-link:hover{color:var(--red)}
+
+@media(max-width:520px){.two,.three,.four{grid-template-columns:1fr}.tiles.cols2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <svg class="logo-svg" viewBox="0 0 80 60" fill="none">
+    <polygon points="40,2 76,54 4,54" fill="#8B1A1A"/>
+    <polygon points="40,18 62,54 18,54" fill="#A52020"/>
+    <polygon points="40,24 58,54 22,54" fill="white"/>
+    <rect x="33" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="37" width="6" height="6" fill="#3A3535"/>
+    <rect x="33" y="45" width="6" height="6" fill="#3A3535"/>
+    <rect x="41" y="45" width="6" height="6" fill="#3A3535"/>
+  </svg>
+  <div class="hdr-div"></div>
+  <div>
+    <div class="hdr-name">Delta Realty Corp.</div>
+    <div class="hdr-form">Offer to Purchase · MB8</div>
+  </div>
+  <a href="index.html" class="hdr-back">← All Forms</a>
+</header>
+
+<div class="progress-wrap">
+  <div class="prog-meta">
+    <span id="step-label-sm">Step 1 of 7</span>
+    <span id="step-name-sm">Buyer</span>
+  </div>
+  <div class="progress"><div class="progress-bar" id="prog-bar" style="width:14%"></div></div>
+</div>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 1 · BUYER
+═══════════════════════════════════════════════════════ -->
+<div class="step active" id="step-1">
+  <div class="step-hero">
+    <div class="step-label">Step 1 — Parties</div>
+    <div class="step-title">Who is making this offer?</div>
+    <div class="step-hint">Enter the full legal name(s) of all buyers exactly as they should appear on title. For entities, use the full registered name (e.g. ABC Holdings LLC).</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Buyer Information</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>Buyer name(s) — as they appear on title</label>
+        <input type="text" id="buyer_name" placeholder="e.g. John A. Smith and Jane B. Smith">
+        <div class="err-msg" id="err-buyer_name">Buyer name is required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn btn-red" onclick="goNext(1)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 2 · PROPERTY
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-2">
+  <div class="step-hero">
+    <div class="step-label">Step 2 — Property</div>
+    <div class="step-title">What property are you offering on?</div>
+    <div class="step-hint">Use the full street address. The address will appear on the header of every page of the contract.</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Property Address</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>Street address</label>
+        <input type="text" id="addr_street" placeholder="e.g. 4521 S. Cottage Grove Ave">
+        <div class="err-msg" id="err-addr_street">Street address is required.</div>
+      </div>
+      <div class="field">
+        <label>Unit / Apt <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="addr_unit" placeholder="e.g. Unit 3B">
+      </div>
+      <div class="three">
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="addr_city" placeholder="Chicago">
+          <div class="err-msg" id="err-addr_city">City is required.</div>
+        </div>
+        <div class="field">
+          <label>State</label>
+          <select id="addr_state">
+            <option value="IL">IL</option>
+            <option value="IN">IN</option>
+            <option value="WI">WI</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ZIP Code</label>
+          <input type="text" id="addr_zip" placeholder="60619" maxlength="5" inputmode="numeric">
+          <div class="err-msg" id="err-addr_zip">ZIP is required.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>County</label>
+        <select id="addr_county">
+          <option value="">Select county</option>
+          <option value="Cook">Cook</option>
+          <option value="DuPage">DuPage</option>
+          <option value="Lake">Lake (IL)</option>
+          <option value="Will">Will</option>
+          <option value="Kane">Kane</option>
+          <option value="McHenry">McHenry</option>
+          <option value="Lake IN">Lake (IN)</option>
+          <option value="Porter">Porter</option>
+          <option value="LaPorte">LaPorte</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="goBack(2)">← Back</button>
+    <button class="btn btn-red" onclick="goNext(2)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 3 · PIN
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-3">
+  <div class="step-hero">
+    <div class="step-label">Step 3 — Property ID</div>
+    <div class="step-title">What is the PIN?</div>
+    <div class="step-hint">The Permanent Index Number is the tax ID for the property. Find it on the county assessor's website or on the listing sheet. Cook County format: XX-XX-XXX-XXX-XXXX.</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Permanent Index Number</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>PIN</label>
+        <input type="text" id="pin" placeholder="e.g. 20-36-202-021-0000">
+        <div class="err-msg" id="err-pin">PIN is required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="goBack(3)">← Back</button>
+    <button class="btn btn-red" onclick="goNext(3)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 4 · OFFER PRICE + EARNEST MONEY
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-4">
+  <div class="step-hero">
+    <div class="step-label">Step 4 — Offer Terms</div>
+    <div class="step-title">What are you offering?</div>
+    <div class="step-hint">Earnest money is typically 1–3% of the purchase price. It demonstrates good faith and goes toward your purchase at closing.</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Purchase Price</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>Offer price</label>
+        <input type="text" id="purchase_price" placeholder="e.g. 375,000" inputmode="numeric">
+        <div class="err-msg" id="err-purchase_price">Offer price is required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Earnest Money</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>Earnest money deposit ($)</label>
+        <input type="text" id="earnest_money" placeholder="e.g. 5,000" inputmode="numeric">
+        <div class="err-msg" id="err-earnest_money">Earnest money is required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="goBack(4)">← Back</button>
+    <button class="btn btn-red" onclick="goNext(4)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 5 · CLOSING DATE
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-5">
+  <div class="step-hero">
+    <div class="step-label">Step 5 — Closing</div>
+    <div class="step-title">When do you want to close?</div>
+    <div class="step-hint">Financed offers typically close 30–45 days after acceptance. Cash offers can close in as few as 14 days. Coordinate with your lender or title company before committing to a date.</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Closing Date</div>
+    <div class="card-body fields">
+      <div class="field">
+        <label>Target closing date</label>
+        <input type="date" id="closing_date">
+        <div class="err-msg" id="err-closing_date">Closing date is required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="goBack(5)">← Back</button>
+    <button class="btn btn-red" onclick="goNext(5)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 6 · FINANCING
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-6">
+  <div class="step-hero">
+    <div class="step-label">Step 6 — Financing</div>
+    <div class="step-title">How are you paying?</div>
+    <div class="step-hint">This determines which paragraph of the contract applies to your offer.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Payment Method</div>
+    <div class="card-body">
+      <div class="tiles">
+        <div class="tile" id="tile-cash" onclick="selectPayment('cash')">
+          <input type="radio" name="pay_type" value="cash">
+          <div>
+            <div class="tile-label">All cash — no financing</div>
+            <div class="tile-sub">Full purchase price paid at closing, no mortgage required</div>
+          </div>
+        </div>
+        <div class="tile" id="tile-financing" onclick="selectPayment('financing')">
+          <input type="radio" name="pay_type" value="financing">
+          <div>
+            <div class="tile-label">Financing (mortgage)</div>
+            <div class="tile-sub">Obtaining a loan to fund the purchase</div>
+          </div>
+        </div>
+      </div>
+      <div class="err-msg" id="err-pay_type" style="margin-top:8px">Please select a payment method.</div>
+
+      <!-- Financing sub-questions -->
+      <div class="cond" id="cond-financing">
+        <div class="cond-title">Loan Details</div>
+        <div class="fields">
+          <div class="field">
+            <label>Loan type</label>
+            <div class="tiles cols2" style="margin-top:4px">
+              <div class="tile" id="lt-conventional" onclick="selectLoan('conventional')">
+                <input type="radio" name="loan_type" value="conventional">
+                <div><div class="tile-label">Conventional</div></div>
+              </div>
+              <div class="tile" id="lt-fha" onclick="selectLoan('fha')">
+                <input type="radio" name="loan_type" value="fha">
+                <div><div class="tile-label">FHA</div></div>
+              </div>
+              <div class="tile" id="lt-va" onclick="selectLoan('va')">
+                <input type="radio" name="loan_type" value="va">
+                <div><div class="tile-label">VA</div></div>
+              </div>
+              <div class="tile" id="lt-usda" onclick="selectLoan('usda')">
+                <input type="radio" name="loan_type" value="usda">
+                <div><div class="tile-label">USDA</div></div>
+              </div>
+              <div class="tile" id="lt-other" onclick="selectLoan('other')" style="grid-column:span 2">
+                <input type="radio" name="loan_type" value="other">
+                <div>
+                  <div class="tile-label">Other</div>
+                  <div class="tile-sub">Hard money, non-QM, portfolio loan</div>
+                </div>
+              </div>
+            </div>
+            <div class="err-msg" id="err-loan_type">Please select a loan type.</div>
+          </div>
+          <div class="field" style="margin-top:8px">
+            <label>Down payment</label>
+            <div class="tiles cols2" style="margin-top:4px">
+              <div class="tile" id="dp-0" onclick="selectDown('0')"><input type="radio" name="down_pct" value="0"><div><div class="tile-label">0%</div><div class="tile-sub">VA / USDA</div></div></div>
+              <div class="tile" id="dp-3.5" onclick="selectDown('3.5')"><input type="radio" name="down_pct" value="3.5"><div><div class="tile-label">3.5%</div><div class="tile-sub">FHA minimum</div></div></div>
+              <div class="tile" id="dp-5" onclick="selectDown('5')"><input type="radio" name="down_pct" value="5"><div><div class="tile-label">5%</div></div></div>
+              <div class="tile" id="dp-10" onclick="selectDown('10')"><input type="radio" name="down_pct" value="10"><div><div class="tile-label">10%</div></div></div>
+              <div class="tile" id="dp-15" onclick="selectDown('15')"><input type="radio" name="down_pct" value="15"><div><div class="tile-label">15%</div></div></div>
+              <div class="tile" id="dp-20" onclick="selectDown('20')"><input type="radio" name="down_pct" value="20"><div><div class="tile-label">20%</div></div></div>
+              <div class="tile" id="dp-25" onclick="selectDown('25')"><input type="radio" name="down_pct" value="25"><div><div class="tile-label">25%</div></div></div>
+              <div class="tile" id="dp-custom" onclick="selectDown('custom')"><input type="radio" name="down_pct" value="custom"><div><div class="tile-label">Other</div></div></div>
+            </div>
+            <div class="err-msg" id="err-down_pct">Please select a down payment.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="goBack(6)">← Back</button>
+    <button class="btn btn-red" onclick="goNext(6)">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     STEP 7 · REVIEW + GENERATE
+═══════════════════════════════════════════════════════ -->
+<div class="step" id="step-7">
+  <div class="step-hero">
+    <div class="step-label">Step 7 — Review</div>
+    <div class="step-title">Review your offer</div>
+    <div class="step-hint">Confirm everything looks correct. Once you generate, the contract PDF will download immediately to your device.</div>
+  </div>
+
+  <div class="summary" id="summary-box"></div>
+
+  <div class="note">This generates the Multi-Board Residential Real Estate Contract 8.0 with your offer details pre-filled. Review it carefully with your agent before submitting to the seller.</div>
+
+  <!-- Generating state -->
+  <div class="generating" id="gen-state" style="display:none">
+    <div class="gen-icon">⚙️</div>
+    <div class="gen-msg">Building your contract...<br>This takes a few seconds.</div>
+  </div>
+
+  <!-- Success state -->
+  <div class="success" id="success-state">
+    <div class="success-check">✓</div>
+    <h2>Your contract is ready</h2>
+    <p>The MB8 contract has been filled with your offer details. Review it with your agent before submitting to the seller.</p>
+    <button class="btn-dl" id="dl-btn">⬇ Download Contract</button>
+    <span class="restart-link" onclick="startOver()">Start a new offer</span>
+  </div>
+
+  <div id="submit-area">
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goBack(7)">← Back</button>
+      <button class="btn btn-red" id="generate-btn" onclick="generateContract()">Generate Contract →</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentStep = 1;
+const TOTAL = 7;
+let payType = '', loanType = '', downPct = '';
+let pdfBlob = null;
+
+const STEP_NAMES = ['','Buyer','Property','PIN','Offer Terms','Closing','Financing','Review'];
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  currentStep = n;
+  const pct = Math.round(n / TOTAL * 100);
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('step-label-sm').textContent = 'Step ' + n + ' of ' + TOTAL;
+  document.getElementById('step-name-sm').textContent = STEP_NAMES[n];
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function goBack(from) { showStep(from - 1); }
+
+function goNext(step) {
+  if (!validate(step)) return;
+  if (step === TOTAL - 1) buildSummary();
+  showStep(step + 1);
+}
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+function showErr(id, show) {
+  const el = document.getElementById('err-' + id);
+  const inp = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+  if (inp) inp.classList.toggle('err', show);
+}
+
+function validate(step) {
+  let ok = true;
+  if (step === 1) {
+    const b = !!v('buyer_name');
+    showErr('buyer_name', !b); if (!b) ok = false;
+  }
+  if (step === 2) {
+    ['addr_street','addr_city','addr_zip'].forEach(id => {
+      const b = !!v(id); showErr(id, !b); if (!b) ok = false;
+    });
+  }
+  if (step === 3) {
+    const b = !!v('pin'); showErr('pin', !b); if (!b) ok = false;
+  }
+  if (step === 4) {
+    ['purchase_price','earnest_money'].forEach(id => {
+      const b = !!v(id); showErr(id, !b); if (!b) ok = false;
+    });
+  }
+  if (step === 5) {
+    const b = !!v('closing_date'); showErr('closing_date', !b); if (!b) ok = false;
+  }
+  if (step === 6) {
+    if (!payType) { document.getElementById('err-pay_type').classList.add('show'); ok = false; }
+    else document.getElementById('err-pay_type').classList.remove('show');
+    if (payType === 'financing') {
+      if (!loanType) { document.getElementById('err-loan_type').classList.add('show'); ok = false; }
+      else document.getElementById('err-loan_type').classList.remove('show');
+      if (!downPct) { document.getElementById('err-down_pct').classList.add('show'); ok = false; }
+      else document.getElementById('err-down_pct').classList.remove('show');
+    }
+  }
+  return ok;
+}
+
+// ─── Option selectors ─────────────────────────────────────────────────────────
+function selectPayment(type) {
+  payType = type;
+  ['cash','financing'].forEach(t =>
+    document.getElementById('tile-' + t).classList.toggle('selected', t === type));
+  document.querySelector(`input[name=pay_type][value="${type}"]`).checked = true;
+  document.getElementById('cond-financing').classList.toggle('show', type === 'financing');
+  document.getElementById('err-pay_type').classList.remove('show');
+}
+
+function selectLoan(type) {
+  loanType = type;
+  ['conventional','fha','va','usda','other'].forEach(t =>
+    document.getElementById('lt-' + t).classList.toggle('selected', t === type));
+  document.querySelector(`input[name=loan_type][value="${type}"]`).checked = true;
+  document.getElementById('err-loan_type').classList.remove('show');
+}
+
+function selectDown(pct) {
+  downPct = pct;
+  ['0','3.5','5','10','15','20','25','custom'].forEach(p =>
+    document.getElementById('dp-' + p).classList.toggle('selected', p === pct));
+  document.querySelector(`input[name=down_pct][value="${pct}"]`).checked = true;
+  document.getElementById('err-down_pct').classList.remove('show');
+}
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+function fmtMoney(s) {
+  const n = parseFloat(String(s).replace(/,/g,''));
+  return isNaN(n) ? s : '$' + n.toLocaleString();
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return months[+m-1] + ' ' + +day + ', ' + y;
+}
+
+function buildSummary() {
+  const addr = [v('addr_street'), v('addr_unit'), v('addr_city'), v('addr_state'), v('addr_zip')].filter(Boolean).join(', ');
+  const loan_labels = {conventional:'Conventional',fha:'FHA',va:'VA',usda:'USDA',other:'Other / Hard money'};
+  const pay_str = payType === 'cash' ? 'All cash' : ('Financed — ' + (loan_labels[loanType]||'') + (downPct && downPct!=='custom' ? ', ' + downPct + '% down' : ''));
+
+  const rows = [
+    ['Buyer','Buyer name',v('buyer_name')],
+    ['Property','Address',addr],
+    ['Property','County',v('addr_county')||'—'],
+    ['Property','PIN',v('pin')],
+    ['Terms','Offer price',fmtMoney(v('purchase_price'))],
+    ['Terms','Earnest money',fmtMoney(v('earnest_money'))],
+    ['Terms','Closing date',fmtDate(v('closing_date'))],
+    ['Terms','Payment',pay_str],
+  ];
+
+  let html = '', lastSection = '';
+  rows.forEach(([sec, key, val]) => {
+    if (sec !== lastSection) {
+      html += `<div class="summary-hdr">${sec}</div>`;
+      lastSection = sec;
+    }
+    html += `<div class="summary-row"><span class="s-key">${key}</span><span class="s-val">${val}</span></div>`;
+  });
+  document.getElementById('summary-box').innerHTML = html;
+}
+
+// ─── Collect answers ─────────────────────────────────────────────────────────
+function collectAnswers() {
+  const street = v('addr_street');
+  const unit   = v('addr_unit');
+  const city   = v('addr_city');
+  const state  = v('addr_state') || 'IL';
+  const zip    = v('addr_zip');
+  const county = v('addr_county');
+  const addr_full = [street + (unit?' '+unit:''), city, state, zip].filter(Boolean).join(', ');
+
+  return {
+    buyer_name:     v('buyer_name'),
+    addr_street:    street + (unit ? ' ' + unit : ''),
+    addr_city:      city,
+    addr_state:     state,
+    addr_zip:       zip,
+    addr_county:    county,
+    addr_full:      addr_full,
+    pin:            v('pin'),
+    purchase_price: v('purchase_price').replace(/,/g,''),
+    earnest_money:  v('earnest_money').replace(/,/g,''),
+    closing_date:   v('closing_date'),
+    pay_type:       payType,
+    loan_type:      loanType,
+    down_pct:       downPct === 'custom' ? '' : downPct,
+  };
+}
+
+// ─── PDF generation ──────────────────────────────────────────────────────────
+
+// Coordinate map for MB8 v8.0 (612x792pt pages, top-down coords)
+// Each entry: {page, x, y (top of field), w, h, fs}
+// Footer address appears on every page — handled separately
+function buildCoordMap(a) {
+  const map = {};
+
+  // PAGE 1
+  // Line 2: Buyer name — after "[PLEASE PRINT]" label ends at x1=181.8, line top=58.9
+  map.buyer_name   = {page:1, x:184,  y:58.9, w:400, h:12, fs:9};
+
+  // Line 9: Address row top=169.3
+  map.addr_street  = {page:1, x:68,   y:169.3, w:120, h:11, fs:8.5};
+  map.addr_city    = {page:1, x:264,  y:169.3, w:100, h:11, fs:8.5};
+  map.addr_state   = {page:1, x:452,  y:169.3, w:22,  h:11, fs:8.5};
+  map.addr_zip     = {page:1, x:477,  y:169.3, w:40,  h:11, fs:8.5};
+  map.addr_county  = {page:1, x:522,  y:169.3, w:72,  h:11, fs:8.5};
+
+  // Line 10: PIN — top=183.6, field starts after "Number(s):" at x1=178.3
+  map.pin          = {page:1, x:181,  y:183.6, w:400, h:11, fs:8.5};
+
+  // Line 16: Purchase Price — "is $" at x=327.5, field ends before "." at x=441
+  map.purchase_price = {page:1, x:335, y:284.7, w:102, h:11, fs:9};
+
+  // Line 22: Earnest Money — "$" at x=253.8, blank until "shall" at x=362.8
+  map.earnest_money = {page:1, x:262, y:377.8, w:96,  h:11, fs:9};
+
+  // Line 36: Closing date — "on" ends at x1=194.4, "," at x0=306.0, "20" at x0=311.5
+  map.closing_month_day = {page:1, x:196, y:601.3, w:107, h:11, fs:9};
+  map.closing_year      = {page:1, x:323, y:601.3, w:36,  h:11, fs:9};
+
+  return map;
+}
+
+// Footer address field (all 14 pages, same position)
+// "Address:" label at top=756.8 x0=36, value goes right after
+function makeFooterEntries(addrFull, totalPages) {
+  const entries = [];
+  for (let pg = 1; pg <= totalPages; pg++) {
+    entries.push({page: pg, x: 80, y: 756.8, w: 490, h: 10, fs: 7.5});
+  }
+  return entries;
+}
+
+async function loadLib(src, check) {
+  if (check && check()) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res;
+    s.onerror = () => rej(new Error('Could not load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+function safeTxt(s) {
+  return String(s??'')
+    .replace(/[‘’]/g,"'").replace(/[“”]/g,'"')
+    .replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
+}
+
+function trimToWidth(doc, text, maxW) {
+  text = safeTxt(text);
+  if (!text || doc.getTextWidth(text) <= maxW) return text;
+  while (text.length > 1 && doc.getTextWidth(text+'...') > maxW) text = text.slice(0,-1);
+  return text.length > 1 ? text+'...' : '';
+}
+
+async function generateContract() {
+  if (!validate(7)) return;  // shouldn't happen, but guard
+
+  const a = collectAnswers();
+
+  // Show generating state
+  document.getElementById('gen-state').style.display = 'block';
+  document.getElementById('submit-area').style.display = 'none';
+  document.getElementById('summary-box').style.display = 'none';
+  document.querySelector('#step-7 .step-hero').style.display = 'none';
+  document.querySelector('#step-7 .note')?.style && (document.querySelector('#step-7 .note').style.display = 'none');
+
+  try {
+    await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', () => window.pdfjsLib);
+    await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => window.jspdf?.jsPDF);
+
+    const pdfjsLib = window.pdfjsLib;
+    const { jsPDF } = window.jspdf;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const resp = await fetch('MB8_REALESTATECONTRACT_0225_6.pdf?v=' + Date.now(), {cache: 'no-store'});
+    if (!resp.ok) throw new Error('Cannot load the MB8 PDF. Make sure MB8_REALESTATECONTRACT_0225_6.pdf is in the same folder as this page.');
+    const bytes = new Uint8Array(await resp.arrayBuffer());
+
+    const srcPdf = await pdfjsLib.getDocument({
+      data: bytes, useWorker: true, disableFontFace: false, isEvalSupported: false
+    }).promise;
+
+    const totalPages = srcPdf.numPages;
+
+    // Build coordinate map for this offer
+    const coordMap = buildCoordMap(a);
+    const footerEntries = makeFooterEntries(a.addr_full, totalPages);
+
+    // Parse closing date parts
+    let closingMonthDay = '', closingYear = '';
+    if (a.closing_date) {
+      const [y,m,d] = a.closing_date.split('-');
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      closingMonthDay = months[+m-1] + ' ' + +d;
+      closingYear = y;
+    }
+
+    // Field values to write
+    const fieldValues = {
+      buyer_name:       a.buyer_name,
+      addr_street:      a.addr_street,
+      addr_city:        a.addr_city,
+      addr_state:       a.addr_state,
+      addr_zip:         a.addr_zip,
+      addr_county:      a.addr_county,
+      pin:              a.pin,
+      purchase_price:   a.purchase_price ? '$' + Number(a.purchase_price).toLocaleString() : '',
+      earnest_money:    a.earnest_money  ? '$' + Number(a.earnest_money).toLocaleString()  : '',
+      closing_month_day: closingMonthDay,
+      closing_year:     closingYear,
+    };
+
+    let out = null;
+
+    for (let pg = 1; pg <= totalPages; pg++) {
+      const page = await srcPdf.getPage(pg);
+      const base = page.getViewport({scale:1});
+      const W = base.width, H = base.height;
+
+      if (!out) {
+        out = new jsPDF({unit:'pt', format:[W,H], orientation: W>H?'landscape':'portrait', compress:true});
+      } else {
+        out.addPage([W,H], W>H?'landscape':'portrait');
+      }
+
+      // Render the PDF page to canvas
+      const scale = Math.min(2, Math.max(1.35, window.devicePixelRatio || 1.5));
+      const vp = page.getViewport({scale});
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(vp.width);
+      canvas.height = Math.ceil(vp.height);
+      const ctx = canvas.getContext('2d', {alpha:false});
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({canvasContext:ctx, viewport:vp}).promise;
+      out.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W, H, undefined, 'FAST');
+
+      out.setFont('helvetica','normal');
+      out.setTextColor(0,0,0);
+
+      // Draw named field values
+      for (const [fid, coords] of Object.entries(coordMap)) {
+        const val = fieldValues[fid];
+        if (!val || !String(val).trim()) continue;
+        if (Number(coords.page) !== pg) continue;
+        const fs = coords.fs || 9;
+        out.setFontSize(fs);
+        const text = trimToWidth(out, val, coords.w - 2);
+        if (!text) continue;
+        out.text(text, coords.x, coords.y + coords.h - 2, {baseline:'alphabetic'});
+      }
+
+      // Draw footer address on every page
+      if (a.addr_full) {
+        out.setFontSize(7.5);
+        const footerText = trimToWidth(out, a.addr_full, 490);
+        if (footerText) out.text(footerText, 80, 756.8 + 10 - 2, {baseline:'alphabetic'});
+      }
+    }
+
+    if (!out) throw new Error('PDF had no pages.');
+
+    // Save blob for download button
+    pdfBlob = out.output('blob');
+    const url = URL.createObjectURL(pdfBlob);
+
+    // Wire download button
+    document.getElementById('dl-btn').onclick = () => {
+      const a = document.createElement('a');
+      a.href = url;
+      const addrSlug = fieldValues.addr_street.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,30);
+      a.download = 'MB8_Offer_' + addrSlug + '.pdf';
+      a.click();
+    };
+
+    // Auto-trigger download once
+    document.getElementById('dl-btn').click();
+
+    // Show success
+    document.getElementById('gen-state').style.display = 'none';
+    document.getElementById('success-state').style.display = 'block';
+
+  } catch(err) {
+    document.getElementById('gen-state').style.display = 'none';
+    document.getElementById('submit-area').style.display = 'block';
+    document.getElementById('summary-box').style.display = 'block';
+    document.querySelector('#step-7 .step-hero').style.display = 'block';
+    const note = document.querySelector('#step-7 .note');
+    if (note) note.style.display = 'block';
+    alert('Error generating contract:\n\n' + err.message + '\n\nPlease try again or contact your agent.');
+    console.error(err);
+  }
+}
+
+function startOver() {
+  pdfBlob = null; payType = ''; loanType = ''; downPct = '';
+  document.querySelectorAll('input[type=text], input[type=date]').forEach(i => i.value = '');
+  document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
+  document.getElementById('cond-financing').classList.remove('show');
+  document.getElementById('success-state').style.display = 'none';
+  document.getElementById('submit-area').style.display = 'block';
+  document.getElementById('summary-box').style.display = 'block';
+  document.querySelector('#step-7 .step-hero').style.display = 'block';
+  const note = document.querySelector('#step-7 .note');
+  if (note) note.style.display = 'block';
+  showStep(1);
+}
+
+// Set min date for closing (14 days out)
+const minDate = new Date();
+minDate.setDate(minDate.getDate() + 14);
+document.getElementById('closing_date').min = minDate.toISOString().split('T')[0];
+</script>
+</body>
+</html>
